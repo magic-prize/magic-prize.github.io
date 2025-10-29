@@ -1,24 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The Magic Prize</title>
   </head>
   <style>
     body {
       margin: 0 auto;
       padding: 0;
+      background: #000000;
+      max-width: 1920px;
     }
-
     img {
       width: 100%;
-      margin-bottom: -6px;
+      margin-bottom: -7px;
+    }
+    #image-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .lazy {
+      display: flex;
+      max-width: 1000px;
     }
   </style>
   <body>
-    <img src="part1.png" />
-    <img src="part2.png" />
-    <img src="part3.png" />
-    <img src="part4.png" />
-    <img src="part5.png" />
+    <div id="image-container"></div>
+    <script>
+      (function () {
+        const imageContainer = document.getElementById("image-container");
+        let currentBucket;
+
+        function lazyLoadImages() {
+          const lazyImages = document.querySelectorAll("img.lazy");
+
+          // Load all images and replace loading.gif only when loaded
+          lazyImages.forEach((img) => {
+            const actualImage = new Image();
+            actualImage.onload = function () {
+              img.src = img.dataset.src;
+              img.classList.remove("lazy");
+            };
+            actualImage.src = img.dataset.src;
+          });
+        }
+
+        function updateImages() {
+          const screenWidth =
+            document.documentElement.clientWidth || window.innerWidth;
+          let newBucket = 1920; // Default size
+
+          if (screenWidth <= 360) {
+            newBucket = 360;
+          } else if (screenWidth <= 480) {
+            newBucket = 480;
+          } else if (screenWidth <= 640) {
+            newBucket = 640;
+          } else if (screenWidth <= 960) {
+            newBucket = 960;
+          }
+
+          if (newBucket !== currentBucket) {
+            currentBucket = newBucket;
+            let imagesHtml = "";
+            for (let i = 1; i <= 5; i++) {
+              imagesHtml +=
+                '<img src="loading.gif" data-src="adaptive/' +
+                currentBucket +
+                "/p" +
+                i +
+                '.png" class="lazy" loading="lazy"/>';
+            }
+            imageContainer.innerHTML = imagesHtml;
+            lazyLoadImages();
+          }
+        }
+
+        window.addEventListener("resize", updateImages);
+        updateImages(); // Initial call
+      })();
+    </script>
   </body>
 </html>
