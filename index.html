@@ -15,6 +15,13 @@
     img {
       width: 100%;
       margin-bottom: -7px;
+      transition: filter 0.3s ease, opacity 0.3s ease;
+    }
+    img.low-res {
+      filter: blur(5px);
+    }
+    img.high-res {
+      filter: blur(0);
     }
     #image-container {
       display: flex;
@@ -108,33 +115,47 @@
         const loader = document.getElementById("loader");
         let currentBucket;
 
-        function lazyLoadImages() {
-          const lazyImages = document.querySelectorAll("img.lazy");
+        function progressiveLoadImages() {
+          const images = document.querySelectorAll("img.lazy");
           let loadedCount = 0;
-          const totalImages = lazyImages.length;
+          const totalImages = images.length;
 
           // Show loader
           if (loader) {
             loader.classList.add("active");
           }
 
-          // Load all images
-          lazyImages.forEach((img) => {
-            const actualImage = new Image();
-            actualImage.onload = function () {
-              img.src = img.dataset.src;
-              img.classList.remove("lazy");
-              img.style.opacity = "1";
-              loadedCount++;
+          // Load low-res images first
+          images.forEach((img, index) => {
+            const lowResImage = new Image();
+            const highResSrc = img.dataset.src;
+            const lowResSrc = highResSrc.replace(/\/\d+\//, "/blur/");
 
-              // Hide loader when all images are loaded
-              if (loadedCount === totalImages) {
-                if (loader) {
-                  loader.classList.remove("active");
+            // Load low-res first
+            lowResImage.onload = function () {
+              img.src = lowResSrc;
+              img.classList.add("low-res");
+              img.style.opacity = "1";
+
+              // Then load high-res
+              const highResImage = new Image();
+              highResImage.onload = function () {
+                img.src = highResSrc;
+                img.classList.remove("low-res");
+                img.classList.add("high-res");
+                img.classList.remove("lazy");
+                loadedCount++;
+
+                // Hide loader when all high-res images are loaded
+                if (loadedCount === totalImages) {
+                  if (loader) {
+                    loader.classList.remove("active");
+                  }
                 }
-              }
+              };
+              highResImage.src = highResSrc;
             };
-            actualImage.src = img.dataset.src;
+            lowResImage.src = lowResSrc;
           });
         }
 
@@ -165,7 +186,7 @@
                 '.png" class="lazy" loading="lazy" style="opacity: 0; transition: opacity 0.3s;"/>';
             }
             imageContainer.innerHTML = imagesHtml;
-            lazyLoadImages();
+            progressiveLoadImages();
           }
         }
 
