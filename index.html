@@ -4,11 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The Magic Prize</title>
-    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
   </head>
   <style>
     body {
@@ -31,23 +26,75 @@
       display: flex;
       max-width: 1000px;
     }
+
+    .loader {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: none;
+      margin: 15px auto;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      box-sizing: border-box;
+      animation: animloader 2s linear infinite;
+      z-index: 1000;
+    }
+
+    .loader.active {
+      display: block;
+    }
+
+    @keyframes animloader {
+      0% {
+        box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 -2px;
+      }
+      25% {
+        box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 2px;
+      }
+      50% {
+        box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 2px, -38px 0 0 -2px;
+      }
+      75% {
+        box-shadow: 14px 0 0 2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 -2px;
+      }
+      100% {
+        box-shadow: 14px 0 0 -2px, 38px 0 0 2px, -14px 0 0 -2px, -38px 0 0 -2px;
+      }
+    }
   </style>
   <body>
+    <span class="loader" id="loader"></span>
     <div id="image-container"></div>
     <script>
       (function () {
         const imageContainer = document.getElementById("image-container");
+        const loader = document.getElementById("loader");
         let currentBucket;
 
         function lazyLoadImages() {
           const lazyImages = document.querySelectorAll("img.lazy");
+          let loadedCount = 0;
+          const totalImages = lazyImages.length;
 
-          // Load all images and replace loading.gif only when loaded
+          // Show loader
+          loader.classList.add("active");
+
+          // Load all images
           lazyImages.forEach((img) => {
             const actualImage = new Image();
             actualImage.onload = function () {
               img.src = img.dataset.src;
               img.classList.remove("lazy");
+              img.style.opacity = "1";
+              loadedCount++;
+              
+              // Hide loader when all images are loaded
+              if (loadedCount === totalImages) {
+                loader.classList.remove("active");
+              }
             };
             actualImage.src = img.dataset.src;
           });
@@ -73,11 +120,11 @@
             let imagesHtml = "";
             for (let i = 1; i <= 5; i++) {
               imagesHtml +=
-                '<img src="loading.gif" data-src="adaptive/' +
+                '<img data-src="adaptive/' +
                 currentBucket +
                 "/p" +
                 i +
-                '.png" class="lazy" loading="lazy"/>';
+                '.png" class="lazy" loading="lazy" style="opacity: 0; transition: opacity 0.3s;"/>';
             }
             imageContainer.innerHTML = imagesHtml;
             lazyLoadImages();
