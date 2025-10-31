@@ -145,10 +145,9 @@
                 img.classList.remove("low-res");
                 img.classList.add("high-res");
                 img.classList.remove("lazy");
-                loadedCount++;
-
-                // Hide loader after the first high-res image loads
-                if (loadedCount === 1 && loader) {
+                
+                // Hide loader specifically after 1.png loads
+                if (highResSrc.endsWith('1.png') && loader) {
                   loader.classList.remove("active");
                 }
               };
