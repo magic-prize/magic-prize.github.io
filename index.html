@@ -129,7 +129,8 @@
           images.forEach((img, index) => {
             const lowResImage = new Image();
             const highResSrc = img.dataset.src;
-            const lowResSrc = highResSrc.replace(/\/\d+\//, "/blur/");
+            // const lowResSrc = highResSrc.replace(/\/\d+\//, "/blur/");
+            const lowResSrc = highResSrc.replace(/\.png/, "_blur.png");
 
             // Load low-res first
             lowResImage.onload = function () {
