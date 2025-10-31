@@ -27,46 +27,80 @@
       max-width: 1000px;
     }
 
-    .loader {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
+    .lds-ellipsis,
+    .lds-ellipsis div {
+      box-sizing: border-box;
+    }
+    .lds-ellipsis {
       display: none;
-      margin: 15px auto;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: #fff;
-      box-sizing: border-box;
-      animation: animloader 2s linear infinite;
+      width: 80px;
+      height: 80px;
       z-index: 1000;
     }
-
-    .loader.active {
-      display: block;
+    .lds-ellipsis.active {
+      display: inline-block;
     }
-
-    @keyframes animloader {
+    .lds-ellipsis div {
+      position: absolute;
+      top: 33.33333px;
+      width: 13.33333px;
+      height: 13.33333px;
+      border-radius: 50%;
+      background: #800475;
+      animation-timing-function: cubic-bezier(0, 1, 1, 0);
+    }
+    .lds-ellipsis div:nth-child(1) {
+      left: 8px;
+      animation: lds-ellipsis1 0.6s infinite;
+    }
+    .lds-ellipsis div:nth-child(2) {
+      left: 8px;
+      animation: lds-ellipsis2 0.6s infinite;
+    }
+    .lds-ellipsis div:nth-child(3) {
+      left: 32px;
+      animation: lds-ellipsis2 0.6s infinite;
+    }
+    .lds-ellipsis div:nth-child(4) {
+      left: 56px;
+      animation: lds-ellipsis3 0.6s infinite;
+    }
+    @keyframes lds-ellipsis1 {
       0% {
-        box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 -2px;
-      }
-      25% {
-        box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 2px;
-      }
-      50% {
-        box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 2px, -38px 0 0 -2px;
-      }
-      75% {
-        box-shadow: 14px 0 0 2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 -2px;
+        transform: scale(0);
       }
       100% {
-        box-shadow: 14px 0 0 -2px, 38px 0 0 2px, -14px 0 0 -2px, -38px 0 0 -2px;
+        transform: scale(1);
+      }
+    }
+    @keyframes lds-ellipsis3 {
+      0% {
+        transform: scale(1);
+      }
+      100% {
+        transform: scale(0);
+      }
+    }
+    @keyframes lds-ellipsis2 {
+      0% {
+        transform: translate(0, 0);
+      }
+      100% {
+        transform: translate(24px, 0);
       }
     }
   </style>
   <body>
-    <span class="loader" id="loader"></span>
+    <div class="lds-ellipsis" id="loader">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
     <div id="image-container"></div>
     <script>
       (function () {
@@ -80,7 +114,9 @@
           const totalImages = lazyImages.length;
 
           // Show loader
-          loader.classList.add("active");
+          if (loader) {
+            loader.classList.add("active");
+          }
 
           // Load all images
           lazyImages.forEach((img) => {
@@ -90,10 +126,12 @@
               img.classList.remove("lazy");
               img.style.opacity = "1";
               loadedCount++;
-              
+
               // Hide loader when all images are loaded
               if (loadedCount === totalImages) {
-                loader.classList.remove("active");
+                if (loader) {
+                  loader.classList.remove("active");
+                }
               }
             };
             actualImage.src = img.dataset.src;
