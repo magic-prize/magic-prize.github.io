@@ -157,8 +157,11 @@
                 img.classList.add("high-res");
                 img.classList.remove("lazy");
 
-                // Hide loader specifically after 1.png loads
-                if (highResSrc.endsWith("1.png") && loader) {
+                // Hide loader specifically after 1.png/jpg loads
+                if (
+                  (highResSrc.endsWith("1.png") && loader) ||
+                  (highResSrc.endsWith("1.jpg") && loader)
+                ) {
                   loader.classList.remove("active");
                 }
               };
@@ -186,10 +189,10 @@
           if (newBucket !== currentBucket) {
             currentBucket = newBucket;
             let imagesHtml = "";
-            let imgExt = ".png";
+            let imgExt = ".jpg";
             for (let i = 1; i <= 5; i++) {
-              if (i > 1) {
-                imgExt = ".jpg";
+              if (i === 1 && currentBucket === 1920) {
+                imgExt = ".png";
               }
               imagesHtml +=
                 '<img data-src="adaptive/' +
