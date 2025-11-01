@@ -189,11 +189,8 @@
           if (newBucket !== currentBucket) {
             currentBucket = newBucket;
             let imagesHtml = "";
-            let imgExt = ".jpg";
             for (let i = 1; i <= 5; i++) {
-              if (i === 1 && currentBucket === 1920) {
-                imgExt = ".png";
-              }
+              const imgExt = (i === 1 && currentBucket === 1920) ? '.png' : '.jpg';
               imagesHtml +=
                 '<img data-src="adaptive/' +
                 currentBucket +
